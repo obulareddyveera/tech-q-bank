@@ -5,34 +5,39 @@
             <FormKit type="email" name="email" label="Email" placeholder="Enter your email" />
             <FormKit type="password" name="password" label="Password" placeholder="Enter your password" />
         </FormKit>
+        <div>{{ countries }}</div>
     </div>
 </template>
 
-<script>
-import { ref } from 'vue';
+<script setup>
 import { z } from 'zod';
+import { ref, onMounted } from 'vue'
+import { supabase } from '../lib/supabaseClient.ts'
 
-export default {
-    setup() {
-        // Define Zod schema
-        const loginSchema = z.object({
-            email: z.string().email({ message: "Invalid email format" }),
-            password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-        });
+const countries = ref([])
 
-        const onSubmit = (formData, node) => {
-            const result = loginSchema.safeParse(formData);
-            console.log('Login successful', formData, result);
-            if (result.success) {
-                // Handle successful submission
-            } else {
-                node.setErrors(
-                    result.error.flatten().fieldErrors
-                )
-            }
-        };
+async function getCountries() {
+    const { data } = await supabase.from('tags').select()
+    countries.value = data
+}
 
-        return { onSubmit };
-    },
+onMounted(() => {
+    getCountries()
+});
+const loginSchema = z.object({
+    email: z.string().email({ message: "Invalid email format" }),
+    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+});
+
+const onSubmit = (formData, node) => {
+    const result = loginSchema.safeParse(formData);
+    console.log('Login successful', formData, result);
+    if (result.success) {
+        // Handle successful submission
+    } else {
+        node.setErrors(
+            result.error.flatten().fieldErrors
+        )
+    }
 };
 </script>
