@@ -7,7 +7,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { useCounterStore } from '../stores/counter.ts';
+import { useCounterStore } from '../stores/slices/counter.ts';
 
 const store = useCounterStore();
 const { count } = storeToRefs(store);
